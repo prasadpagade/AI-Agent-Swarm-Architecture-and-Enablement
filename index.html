@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Swarm Architecture Portfolio - Prasad Pagade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .section {
+            display: none;
+            padding: 60px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Home Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        /* Demo Section */
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+            margin: 40px 0;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .demo-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .demo-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: none;
+            display: block;
+        }
+
+        /* Architecture Section */
+        .content-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            padding: 60px;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .content-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content-section h3 {
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+            color: #667eea;
+        }
+
+        .content-section p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .content-section ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .content-section li {
+            font-size: 1.1em;
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .content-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .tech-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .tech-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Download Cards */
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .download-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .download-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .download-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .download-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .download-card p {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* ROI Section */
+        .roi-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .roi-highlight h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .roi-numbers {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .roi-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .roi-item .big-number {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .roi-item .roi-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            margin-top: 80px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.7;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .hero p {
+                font-size: 1.2em;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+
+            iframe {
+                height: 600px;
+            }
+
+            .content-section {
+                padding: 30px;
+            }
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .code-block code {
+            color: #67e8f9;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🤖 AI Agent Swarm</div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active" onclick="showSection('home')">Home</a></li>
+                <li><a href="#demo" class="nav-link" onclick="showSection('demo')">Live Demo</a></li>
+                <li><a href="#architecture" class="nav-link" onclick="showSection('architecture')">Architecture</a></li>
+                <li><a href="#presentations" class="nav-link" onclick="showSection('presentations')">Presentations</a></li>
+                <li><a href="#roi" class="nav-link" onclick="showSection('roi')">ROI & Strategy</a></li>
+                <li><a href="#download" class="nav-link" onclick="showSection('download')">Downloads</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>🚀 AI Agent Swarm Architecture</h1>
+                <p>How Autonomous Agents Collaborate to Solve Complex Problems</p>
+                <div class="cta-buttons">
+                    <a href="#demo" class="btn btn-primary" onclick="showSection('demo')">Watch Live Demo</a>
+                    <a href="https://github.com/prasadpagade/AI-Agent-Swarm-Architecture-and-Enablement" class="btn btn-secondary" target="_blank">View on GitHub</a>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">3-5x</div>
+                    <div class="stat-label">Speed Improvement</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10x</div>
+                    <div class="stat-label">Quality Enhancement</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$6M+</div>
+                    <div class="stat-label">Expected ROI</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>📋 What's This Portfolio About?</h2>
+                <p>This comprehensive portfolio demonstrates two critical aspects of enterprise AI:</p>
+                
+                <h3>1. Technical Architecture</h3>
+                <ul>
+                    <li>How to build multi-agent AI systems from scratch</li>
+                    <li>Complete working code examples in Python</li>
+                    <li>Production-ready architecture with 6 layers</li>
+                    <li>Real-time collaboration and parallel execution</li>
+                </ul>
+
+                <h3>2. Business Strategy</h3>
+                <ul>
+                    <li>18-month enterprise AI enablement roadmap</li>
+                    <li>$2M-$5M investment strategy</li>
+                    <li>Change management and adoption frameworks</li>
+                    <li>ROI measurement and success metrics</li>
+                </ul>
+
+                <h3>🎯 Perfect For:</h3>
+                <ul>
+                    <li>Technical Architects looking for AI system design patterns</li>
+                    <li>CTOs evaluating enterprise AI strategies</li>
+                    <li>Engineering leaders building AI teams</li>
+                    <li>Anyone interested in multi-agent AI systems</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Demo Section -->
+        <section id="demo" class="section">
+            <div class="demo-container">
+                <div class="demo-header">
+                    <h2>🎬 Interactive Demo: Watch Agents Collaborate</h2>
+                    <p>Click "Next Step" to see how AI agents self-organize and work together</p>
+                </div>
+                <iframe src="swarm_communication_demo.html" title="Interactive Swarm Demo"></iframe>
+            </div>
+
+            <div class="content-section">
+                <h2>How It Works</h2>
+                <p>The demo shows 9 stages of agent collaboration:</p>
+                
+                <ol style="list-style-position: inside; font-size: 1.1em; line-height: 2;">
+                    <li><strong>Task Arrival:</strong> A complex task enters the system</li>
+                    <li><strong>Broadcasting:</strong> All agents are notified</li>
+                    <li><strong>Self-Assessment:</strong> Each agent evaluates if they can help</li>
+                    <li><strong>Reputation Scoring:</strong> Best agents are identified</li>
+                    <li><strong>Team Formation:</strong> Optimal team is formed</li>
+                    <li><strong>Task Decomposition:</strong> Work is divided intelligently</li>
+                    <li><strong>Parallel Execution:</strong> All agents work simultaneously</li>
+                    <li><strong>Result Synthesis:</strong> Outputs are combined</li>
+                    <li><strong>Reputation Update:</strong> Successful agents earn points</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="section">
+            <div class="content-section">
+                <h2>🏗️ System Architecture</h2>
+                <p>A complete 6-layer architecture for production-grade multi-agent AI systems.</p>
+
+                <h3>Architecture Layers</h3>
+                
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 1: Application Interface</h4>
+                    <p>FastAPI REST + WebSocket for real-time communication with clients</p>
+                </div>
+
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 2: Orchestration</h4>
+                    <p>Task Router, Load Balancer, and Consensus Engine for intelligent task distribution</p>
+                </div>
+
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 3: Agent Layer</h4>
+                    <p>Specialized AI agents (Marketing, Finance, Analytics, Support) with domain expertise</p>
+                </div>
+
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 4: Communication</h4>
+                    <p>Redis/RabbitMQ message bus with pub/sub pattern for agent collaboration</p>
+                </div>
+
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 5: Memory & Context</h4>
+                    <p>Vector DB and conversation history for long-term agent knowledge</p>
+                </div>
+
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 40px; border-radius: 15px; margin: 30px 0; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Layer 6: Infrastructure</h4>
+                    <p>LLM APIs, databases, monitoring, and security infrastructure</p>
+                </div>
+
+                <h3>🛠️ Tech Stack</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <strong>Language</strong>
+                        <div>Python 3.11+</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Framework</strong>
+                        <div>FastAPI</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>LLMs</strong>
+                        <div>OpenAI / Anthropic</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Message Bus</strong>
+                        <div>Redis / RabbitMQ</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Database</strong>
+                        <div>PostgreSQL</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Vector DB</strong>
+                        <div>Pinecone / Weaviate</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Container</strong>
+                        <div>Docker</div>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Orchestration</strong>
+                        <div>Kubernetes</div>
+                    </div>
+                </div>
+
+                <h3>💻 Code Highlights</h3>
+                <p>The portfolio includes complete working implementations:</p>
+                <ul>
+                    <li>BaseAgent class with self-assessment logic</li>
+                    <li>SwarmOrchestrator for task coordination</li>
+                    <li>Reputation system with merit-based selection</li>
+                    <li>Parallel execution with asyncio</li>
+                    <li>Result synthesis and validation</li>
+                </ul>
+
+                <div class="code-block">
+                    <code>
+class SwarmOrchestrator:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;async def submit_task(self, task):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Find capable agents<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;agents = await self._find_capable_agents(task)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Score and select best team<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;team = self._form_optimal_team(agents, task)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Execute in parallel<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results = await asyncio.gather(*[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;agent.execute(subtask) for agent, subtask in team<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return self._synthesize(results)
+                    </code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Presentations Section -->
+        <section id="presentations" class="section">
+            <div class="content-section">
+                <h2>📊 Executive Presentations</h2>
+                <p>Two comprehensive slide decks covering technical architecture and business strategy.</p>
+            </div>
+
+            <div class="download-grid">
+                <div class="download-card">
+                    <div class="download-icon">📊</div>
+                    <h3>Architecture Deck</h3>
+                    <p><strong>18 Slides</strong> covering how to architect AI agents from scratch</p>
+                    <ul style="text-align: left; margin: 20px 0;">
+                        <li>Problem & Solution Overview</li>
+                        <li>6-Layer Architecture Design</li>
+                        <li>Agent Design Patterns</li>
+                        <li>Communication & Orchestration</li>
+                        <li>Memory Systems</li>
+                        <li>Monitoring & Security</li>
+                        <li>Implementation Roadmap</li>
+                        <li>Cost Estimates</li>
+                    </ul>
+                    <a href="AI_Agent_Architecture_Deck.pptx" class="download-btn" download>Download Deck</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📈</div>
+                    <h3>Strategy Deck</h3>
+                    <p><strong>20 Slides</strong> on enterprise AI enablement program</p>
+                    <ul style="text-align: left; margin: 20px 0;">
+                        <li>Executive Summary</li>
+                        <li>Why AI Matters Now</li>
+                        <li>4-Phase Rollout Plan (18 months)</li>
+                        <li>Team Structure (AI CoE)</li>
+                        <li>Training Program (3 tiers)</li>
+                        <li>Governance Framework</li>
+                        <li>Change Management</li>
+                        <li>Budget & ROI Analysis</li>
+                    </ul>
+                    <a href="AI_Enablement_Strategy_Deck.pptx" class="download-btn" download>Download Deck</a>
+                </div>
+            </div>
+
+            <div class="content-section" style="margin-top: 40px;">
+                <h3>🎯 Presentation Use Cases</h3>
+                <ul>
+                    <li><strong>Technical Reviews:</strong> Use Architecture Deck for engineering teams</li>
+                    <li><strong>Executive Buy-in:</strong> Use Strategy Deck for C-suite presentations</li>
+                    <li><strong>Board Meetings:</strong> Combine key slides from both decks</li>
+                    <li><strong>Investor Pitches:</strong> Focus on ROI and market opportunity</li>
+                    <li><strong>Team Onboarding:</strong> Training material for new AI initiatives</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ROI Section -->
+        <section id="roi" class="section">
+            <div class="roi-highlight">
+                <h2>💰 Investment & Returns</h2>
+                <p style="font-size: 1.3em; margin-bottom: 40px;">Enterprise AI Enablement Program - 18 Month Roadmap</p>
+                
+                <div class="roi-numbers">
+                    <div class="roi-item">
+                        <div class="big-number">$2M-$5M</div>
+                        <div class="roi-label">Total Investment</div>
+                    </div>
+                    <div class="roi-item">
+                        <div class="big-number">$6M-$25M</div>
+                        <div class="roi-label">Expected Value</div>
+                    </div>
+                    <div class="roi-item">
+                        <div class="big-number">3-5x</div>
+                        <div class="roi-label">ROI Multiple</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>📅 Implementation Roadmap</h2>
+                
+                <div style="margin: 40px 0;">
+                    <h3 style="background: linear-gradient(90deg, #667eea 0%, transparent 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        Phase 1: Foundation (Months 1-3)
+                    </h3>
+                    <ul>
+                        <li>Form AI Center of Excellence (5-7 FTEs)</li>
+                        <li>Conduct enterprise needs assessment</li>
+                        <li>Select tools (ChatGPT Enterprise, GitHub Copilot)</li>
+                        <li>Launch employee training program</li>
+                        <li>Deliver quick wins (email summarization, code completion)</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <h3 style="background: linear-gradient(90deg, #764ba2 0%, transparent 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        Phase 2: Expansion (Months 4-9)
+                    </h3>
+                    <ul>
+                        <li>Deploy department-specific AI tools</li>
+                        <li>Build internal custom AI agents</li>
+                        <li>Establish governance & ethics policies</li>
+                        <li>Scale training to power users</li>
+                        <li>Measure and showcase early ROI</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <h3 style="background: linear-gradient(90deg, #43e97b 0%, transparent 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        Phase 3: Integration (Months 10-15)
+                    </h3>
+                    <ul>
+                        <li>Integrate AI across all workflows</li>
+                        <li>Deploy advanced use cases (multi-agent systems)</li>
+                        <li>Expand to 100% of departments</li>
+                        <li>Refine governance based on learnings</li>
+                        <li>Demonstrate measurable business impact</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <h3 style="background: linear-gradient(90deg, #ffd700 0%, transparent 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        Phase 4: Optimization (Months 16-18)
+                    </h3>
+                    <ul>
+                        <li>Optimize based on performance data</li>
+                        <li>Innovation showcase & celebration</li>
+                        <li>External benchmarking vs competitors</li>
+                        <li>Plan continuous improvement roadmap</li>
+                        <li>Achieve 80%+ active adoption rate</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2>📊 Success Metrics</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">80%</div>
+                        <div class="stat-label">Adoption Target (Month 12)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">20-30%</div>
+                        <div class="stat-label">Time Savings per Employee</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">25%</div>
+                        <div class="stat-label">Quality Improvement</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">18</div>
+                        <div class="stat-label">Months to AI-First Org</div>
+                    </div>
+                </div>
+
+                <h3>🎯 Key Success Factors</h3>
+                <ul>
+                    <li><strong>Executive Sponsorship:</strong> CEO must champion the initiative publicly</li>
+                    <li><strong>Quick Wins:</strong> Show value in first 90 days to build momentum</li>
+                    <li><strong>Comprehensive Training:</strong> All employees AI-literate within 12 months</li>
+                    <li><strong>Strong Governance:</strong> Clear policies prevent disasters</li>
+                    <li><strong>Data-Driven Decisions:</strong> Measure everything, optimize continuously</li>
+                    <li><strong>Change Management:</strong> Cultural transformation takes intentional effort</li>
+                    <li><strong>Celebrate Success:</strong> Recognition fuels continued innovation</li>
+                </ul>
+            </div>
+
+            <div class="content-section">
+                <h2>💼 Budget Breakdown</h2>
+                <div style="background: rgba(102, 126, 234, 0.05); padding: 30px; border-radius: 15px;">
+                    <table style="width: 100%; font-size: 1.1em;">
+                        <tr style="border-bottom: 2px solid #667eea;">
+                            <th style="text-align: left; padding: 15px; color: #667eea;">Category</th>
+                            <th style="text-align: right; padding: 15px; color: #667eea;">Investment</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Personnel (AI CoE Team)</td>
+                            <td style="text-align: right; padding: 15px;">$1.2M - $2.0M</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">LLM API Costs</td>
+                            <td style="text-align: right; padding: 15px;">$200K - $500K</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Tools & Software</td>
+                            <td style="text-align: right; padding: 15px;">$150K - $300K</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Infrastructure</td>
+                            <td style="text-align: right; padding: 15px;">$100K - $250K</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Training & Development</td>
+                            <td style="text-align: right; padding: 15px;">$100K - $200K</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Consulting & Advisory</td>
+                            <td style="text-align: right; padding: 15px;">$150K - $300K</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(102, 126, 234, 0.2);">
+                            <td style="padding: 15px;">Contingency (15%)</td>
+                            <td style="text-align: right; padding: 15px;">$150K - $500K</td>
+                        </tr>
+                        <tr style="border-top: 3px solid #667eea; background: rgba(102, 126, 234, 0.1);">
+                            <td style="padding: 15px;"><strong>Total (18 months)</strong></td>
+                            <td style="text-align: right; padding: 15px;"><strong>$2.0M - $5.0M</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download" class="section">
+            <div class="content-section">
+                <h2>📥 Download All Materials</h2>
+                <p>Get instant access to all portfolio materials including presentations, documentation, and code examples.</p>
+            </div>
+
+            <div class="download-grid">
+                <div class="download-card">
+                    <div class="download-icon">📄</div>
+                    <h3>Technical Blog</h3>
+                    <p>15,000+ word comprehensive guide with working code examples</p>
+                    <a href="swarm_architecture_blog_post.md" class="download-btn" download>Download MD</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📋</div>
+                    <h3>Executive Summary</h3>
+                    <p>One-page overview covering both architecture and strategy</p>
+                    <a href="executive_summary.md" class="download-btn" download>Download MD</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📊</div>
+                    <h3>Architecture Deck</h3>
+                    <p>18 slides on technical architecture design</p>
+                    <a href="AI_Agent_Architecture_Deck.pptx" class="download-btn" download>Download PPTX</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📈</div>
+                    <h3>Strategy Deck</h3>
+                    <p>20 slides on enterprise AI enablement</p>
+                    <a href="AI_Enablement_Strategy_Deck.pptx" class="download-btn" download>Download PPTX</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">🎬</div>
+                    <h3>Interactive Demo</h3>
+                    <p>Standalone HTML with animated visualization</p>
+                    <a href="swarm_communication_demo.html" class="download-btn" download>Download HTML</a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📖</div>
+                    <h3>Complete Guide</h3>
+                    <p>Full documentation on how to use all materials</p>
+                    <a href="README.md" class="download-btn" download>Download MD</a>
+                </div>
+            </div>
+
+            <div class="content-section" style="margin-top: 60px; text-align: center;">
+                <h2>⭐ View Full Repository on GitHub</h2>
+                <p style="margin: 30px 0;">Get all materials, contribute, or star the repository</p>
+                <a href="https://github.com/prasadpagade/AI-Agent-Swarm-Architecture-and-Enablement" class="btn btn-primary" target="_blank" style="font-size: 1.2em; padding: 20px 50px;">
+                    Visit GitHub Repository →
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="https://github.com/prasadpagade" target="_blank">GitHub</a>
+            <a href="https://linkedin.com/in/prasadpagade" target="_blank">LinkedIn</a>
+            <a href="mailto:your.email@example.com">Contact</a>
+        </div>
+        <p style="opacity: 0.7;">© 2025 Prasad Pagade | AI Agent Swarm Architecture Portfolio</p>
+        <p style="opacity: 0.5; margin-top: 10px; font-size: 0.9em;">Built with ❤️ to showcase AI architecture expertise</p>
+    </footer>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('onclick')) return; // Skip if has onclick
+                e.preventDefault();
+                const target = this.getAttribute('href').substring(1);
+                showSection(target);
+            });
+        });
+    </script>
+</body>
+</html>
