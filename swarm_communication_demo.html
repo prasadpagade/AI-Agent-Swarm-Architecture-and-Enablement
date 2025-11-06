@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Swarm Communication Architecture - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stage-info {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stage-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .stage-description {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .visualization {
+            padding: 50px;
+            min-height: 600px;
+            position: relative;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .orchestrator {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            z-index: 10;
+        }
+
+        .orchestrator-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .agents-container {
+            position: absolute;
+            top: 250px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 50px;
+        }
+
+        .agent {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .agent-marketing {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .agent-finance {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .agent-insights {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .agent-support {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .agent.active {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .agent.selected {
+            box-shadow: 0 0 0 5px #ffd700, 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .agent-icon {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .agent-name {
+            font-size: 1em;
+        }
+
+        .agent-stats {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            color: #333;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .agent.active .agent-stats,
+        .agent.selected .agent-stats {
+            opacity: 1;
+        }
+
+        .message {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            opacity: 0;
+            z-index: 5;
+        }
+
+        .task-box {
+            position: absolute;
+            top: 450px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-box.visible {
+            opacity: 1;
+        }
+
+        .task-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .task-details {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: #e9ecef;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .legend {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .legend-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .result-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+        }
+
+        .result-panel.visible {
+            opacity: 1;
+        }
+
+        .result-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-content {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .team-formation {
+            position: absolute;
+            top: 300px;
+            right: 50px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .team-formation.visible {
+            opacity: 1;
+        }
+
+        .team-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+
+        .team-member-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.9); }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .code-snippet {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐝 AI Swarm Communication Architecture</h1>
+            <p>Watch How Intelligent Agents Collaborate to Solve Complex Tasks</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="nextBtn" onclick="nextStage()">Next Step →</button>
+            <button class="btn btn-secondary" id="resetBtn" onclick="resetDemo()">Reset Demo</button>
+            <button class="btn btn-secondary" id="autoBtn" onclick="toggleAuto()">Auto Play</button>
+        </div>
+
+        <div class="stage-info">
+            <div class="stage-title" id="stageTitle">Stage 1: Task Arrival</div>
+            <div class="stage-description" id="stageDescription">A complex task enters the system requiring multiple skills: Marketing, Finance, and Analytics.</div>
+        </div>
+
+        <div class="visualization" id="visualization">
+            <!-- Orchestrator -->
+            <div class="orchestrator">
+                <div class="orchestrator-icon">🎯</div>
+                <div>ORCHESTRATOR</div>
+                <div style="font-size: 0.8em; opacity: 0.8;">Central Coordinator</div>
+            </div>
+
+            <!-- Agents -->
+            <div class="agents-container">
+                <div class="agent agent-marketing" id="agent-marketing">
+                    <div class="agent-icon">📢</div>
+                    <div class="agent-name">Marketing</div>
+                    <div class="agent-stats">
+                        <div>Reputation: <strong>105</strong></div>
+                        <div>Load: <strong>30%</strong></div>
+                    </div>
+                </div>
+
+                <div class="agent agent-finance" id="agent-finance">
+                    <div class="agent-icon">💰</div>
+                    <div class="agent-name">Finance</div>
+                    <div class="agent-stats">
+                        <div>Reputation: <strong>110</strong></div>
+                        <div>Load: <strong>20%</strong></div>
+                    </div>
+                </div>
+
+                <div class="agent agent-insights" id="agent-insights">
+                    <div class="agent-icon">📊</div>
+                    <div class="agent-name">Insights</div>
+                    <div class="agent-stats">
+                        <div>Reputation: <strong>95</strong></div>
+                        <div>Load: <strong>40%</strong></div>
+                    </div>
+                </div>
+
+                <div class="agent agent-support" id="agent-support">
+                    <div class="agent-icon">🎧</div>
+                    <div class="agent-name">Support</div>
+                    <div class="agent-stats">
+                        <div>Reputation: <strong>100</strong></div>
+                        <div>Load: <strong>15%</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Box -->
+            <div class="task-box" id="taskBox">
+                <div class="task-title">📋 Task: Q1 Campaign Launch</div>
+                <div class="task-details">
+                    <div><strong>Type:</strong> Email Campaign with Budget & Analytics</div>
+                    <div><strong>Complexity:</strong> Complex</div>
+                    <div><strong>Required Skills:</strong></div>
+                    <div class="metric-badge">Marketing</div>
+                    <div class="metric-badge">Finance</div>
+                    <div class="metric-badge">Analytics</div>
+                    <div style="margin-top: 10px;"><strong>Budget:</strong> $50,000</div>
+                    <div><strong>Target:</strong> Enterprise Customers</div>
+                </div>
+            </div>
+
+            <!-- Team Formation Panel -->
+            <div class="team-formation" id="teamFormation">
+                <div class="team-title">🏆 Selected Team</div>
+                <div id="teamMembers"></div>
+            </div>
+
+            <!-- Result Panel -->
+            <div class="result-panel" id="resultPanel">
+                <div class="result-title">✅ Task Completed!</div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">🎨 Agent Types & Capabilities</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                    <div><strong>Marketing Agent:</strong> Campaigns, Content, Social Media</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                    <div><strong>Finance Agent:</strong> Budgeting, Forecasting, ROI</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                    <div><strong>Insights Agent:</strong> Analytics, Reporting, Metrics</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                    <div><strong>Support Agent:</strong> Customer Service, Documentation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        let autoPlay = false;
+        let autoPlayInterval = null;
+
+        const stages = [
+            {
+                title: "Stage 1: Task Arrival 📥",
+                description: "A complex task enters the system requiring multiple skills: Marketing, Finance, and Analytics. The orchestrator receives and analyzes the task requirements.",
+                action: stage1_taskArrival
+            },
+            {
+                title: "Stage 2: Broadcast to Agents 📡",
+                description: "The orchestrator broadcasts the task to all agents: 'Who can handle this?' Each agent will self-assess their capabilities.",
+                action: stage2_broadcast
+            },
+            {
+                title: "Stage 3: Agent Self-Assessment 🤔",
+                description: "Agents independently evaluate if they have the required skills, available capacity, and good health status to take on this task.",
+                action: stage3_selfAssessment
+            },
+            {
+                title: "Stage 4: Reputation Scoring 🏆",
+                description: "The orchestrator scores capable agents based on: Reputation (40%), Skill Match (40%), and Current Load (20%). Finance Agent scores highest!",
+                action: stage4_scoring
+            },
+            {
+                title: "Stage 5: Team Formation 👥",
+                description: "Since this is a complex task, multiple agents are needed. The orchestrator forms an optimal team covering all required skills.",
+                action: stage5_teamFormation
+            },
+            {
+                title: "Stage 6: Task Decomposition ✂️",
+                description: "The complex task is broken down into specialized subtasks. Each team member gets work aligned with their expertise.",
+                action: stage6_decomposition
+            },
+            {
+                title: "Stage 7: Parallel Execution ⚡",
+                description: "All agents work simultaneously on their subtasks. This is where the swarm's power shines - massive parallelization!",
+                action: stage7_execution
+            },
+            {
+                title: "Stage 8: Result Synthesis 🔄",
+                description: "Individual results are combined into a coherent final output. The orchestrator ensures all pieces fit together perfectly.",
+                action: stage8_synthesis
+            },
+            {
+                title: "Stage 9: Reputation Update 📈",
+                description: "Successful agents earn reputation points! This creates a natural meritocracy where better performers get more opportunities.",
+                action: stage9_reputation
+            }
+        ];
+
+        function nextStage() {
+            if (currentStage < stages.length) {
+                stages[currentStage].action();
+                updateProgress();
+                currentStage++;
+                
+                if (currentStage < stages.length) {
+                    document.getElementById('stageTitle').textContent = stages[currentStage].title;
+                    document.getElementById('stageDescription').textContent = stages[currentStage].description;
+                } else {
+                    document.getElementById('nextBtn').disabled = true;
+                    document.getElementById('stageTitle').textContent = "🎉 Demo Complete!";
+                    document.getElementById('stageDescription').textContent = "You've seen how AI agents communicate and collaborate in a swarm architecture. Click 'Reset Demo' to watch again!";
+                }
+            }
+        }
+
+        function resetDemo() {
+            currentStage = 0;
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('stageTitle').textContent = stages[0].title;
+            document.getElementById('stageDescription').textContent = stages[0].description;
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Reset all visual elements
+            clearMessages();
+            document.querySelectorAll('.agent').forEach(agent => {
+                agent.classList.remove('active', 'selected', 'pulse', 'glow');
+            });
+            document.getElementById('taskBox').classList.remove('visible');
+            document.getElementById('teamFormation').classList.remove('visible');
+            document.getElementById('resultPanel').classList.remove('visible');
+            
+            if (autoPlay) {
+                toggleAuto();
+            }
+        }
+
+        function toggleAuto() {
+            autoPlay = !autoPlay;
+            const btn = document.getElementById('autoBtn');
+            
+            if (autoPlay) {
+                btn.textContent = 'Stop Auto';
+                btn.style.background = '#dc3545';
+                autoPlayInterval = setInterval(() => {
+                    if (currentStage < stages.length) {
+                        nextStage();
+                    } else {
+                        toggleAuto();
+                    }
+                }, 3000);
+            } else {
+                btn.textContent = 'Auto Play';
+                btn.style.background = '#6c757d';
+                clearInterval(autoPlayInterval);
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentStage) / stages.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function clearMessages() {
+            document.querySelectorAll('.message').forEach(msg => msg.remove());
+        }
+
+        function createMessage(fromX, fromY, toX, toY, duration = 1000) {
+            const message = document.createElement('div');
+            message.className = 'message glow';
+            message.style.left = fromX + 'px';
+            message.style.top = fromY + 'px';
+            document.getElementById('visualization').appendChild(message);
+
+            setTimeout(() => {
+                message.style.opacity = '1';
+                message.style.transition = `all ${duration}ms ease-in-out`;
+                message.style.left = toX + 'px';
+                message.style.top = toY + 'px';
+            }, 50);
+
+            setTimeout(() => {
+                message.remove();
+            }, duration + 100);
+        }
+
+        function getElementCenter(element) {
+            const rect = element.getBoundingClientRect();
+            const vizRect = document.getElementById('visualization').getBoundingClientRect();
+            return {
+                x: rect.left - vizRect.left + rect.width / 2,
+                y: rect.top - vizRect.top + rect.height / 2
+            };
+        }
+
+        // Stage Actions
+        function stage1_taskArrival() {
+            document.getElementById('taskBox').classList.add('visible');
+            const orchestrator = document.querySelector('.orchestrator');
+            orchestrator.classList.add('pulse');
+        }
+
+        function stage2_broadcast() {
+            clearMessages();
+            const orchCenter = getElementCenter(document.querySelector('.orchestrator'));
+            
+            ['agent-marketing', 'agent-finance', 'agent-insights', 'agent-support'].forEach((agentId, index) => {
+                setTimeout(() => {
+                    const agentCenter = getElementCenter(document.getElementById(agentId));
+                    createMessage(orchCenter.x, orchCenter.y, agentCenter.x, agentCenter.y, 800);
+                }, index * 200);
+            });
+        }
+
+        function stage3_selfAssessment() {
+            clearMessages();
+            document.getElementById('agent-marketing').classList.add('active');
+            document.getElementById('agent-finance').classList.add('active');
+            document.getElementById('agent-insights').classList.add('active');
+            
+            setTimeout(() => {
+                const orchCenter = getElementCenter(document.querySelector('.orchestrator'));
+                ['agent-marketing', 'agent-finance', 'agent-insights'].forEach((agentId, index) => {
+                    setTimeout(() => {
+                        const agentCenter = getElementCenter(document.getElementById(agentId));
+                        createMessage(agentCenter.x, agentCenter.y, orchCenter.x, orchCenter.y, 800);
+                    }, index * 200);
+                });
+            }, 1000);
+        }
+
+        function stage4_scoring() {
+            clearMessages();
+            document.querySelectorAll('.agent').forEach(agent => {
+                agent.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById('agent-finance').classList.add('selected', 'pulse');
+            }, 500);
+        }
+
+        function stage5_teamFormation() {
+            document.getElementById('agent-marketing').classList.add('selected');
+            document.getElementById('agent-insights').classList.add('selected');
+            
+            const teamMembers = [
+                { name: 'Finance Agent', icon: '💰', score: 98, color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { name: 'Marketing Agent', icon: '📢', score: 92, color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+                { name: 'Insights Agent', icon: '📊', score: 84, color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }
+            ];
+            
+            const teamHTML = teamMembers.map(member => `
+                <div class="team-member">
+                    <div class="team-member-icon" style="background: ${member.color};">${member.icon}</div>
+                    <div>
+                        <div style="font-weight: bold;">${member.name}</div>
+                        <div style="font-size: 0.85em; color: #666;">Score: ${member.score}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('teamMembers').innerHTML = teamHTML;
+            document.getElementById('teamFormation').classList.add('visible');
+        }
+
+        function stage6_decomposition() {
+            clearMessages();
+            const taskBox = document.getElementById('taskBox');
+            taskBox.innerHTML = `
+                <div class="task-title">✂️ Task Decomposition</div>
+                <div class="task-details">
+                    <div style="margin-bottom: 15px;">
+                        <strong>Subtask 1 → Marketing Agent 📢</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Create campaign creative, messaging, and targeting strategy</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Subtask 2 → Finance Agent 💰</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Budget allocation, cost tracking, and ROI projection</div>
+                    </div>
+                    <div>
+                        <strong>Subtask 3 → Insights Agent 📊</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Analytics setup, KPI definition, and reporting dashboard</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function stage7_execution() {
+            clearMessages();
+            document.querySelectorAll('.selected').forEach(agent => {
+                agent.classList.add('glow');
+            });
+            
+            // Simulate parallel work with multiple messages
+            const agents = ['agent-marketing', 'agent-finance', 'agent-insights'];
+            agents.forEach((agentId, index) => {
+                setTimeout(() => {
+                    const agentCenter = getElementCenter(document.getElementById(agentId));
+                    // Create work animation (agent glowing)
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            createMessage(
+                                agentCenter.x - 20 + Math.random() * 40,
+                                agentCenter.y - 20 + Math.random() * 40,
+                                agentCenter.x + 20 - Math.random() * 40,
+                                agentCenter.y + 20 - Math.random() * 40,
+                                500
+                            );
+                        }, i * 400);
+                    }
+                }, index * 300);
+            });
+        }
+
+        function stage8_synthesis() {
+            clearMessages();
+            const orchCenter = getElementCenter(document.querySelector('.orchestrator'));
+            
+            ['agent-marketing', 'agent-finance', 'agent-insights'].forEach((agentId, index) => {
+                setTimeout(() => {
+                    const agentCenter = getElementCenter(document.getElementById(agentId));
+                    createMessage(agentCenter.x, agentCenter.y, orchCenter.x, orchCenter.y, 1000);
+                }, index * 300);
+            });
+            
+            setTimeout(() => {
+                document.getElementById('resultPanel').classList.add('visible');
+                document.getElementById('resultContent').innerHTML = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>📢 Campaign Creative (Marketing)</strong>
+                        <div style="font-size: 0.95em; color: #666; margin-top: 8px;">
+                            • Subject: "Transform Your Q1 with AI-Powered Solutions"<br>
+                            • Target: Enterprise decision-makers<br>
+                            • Channels: Email + LinkedIn + Webinar
+                        </div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>💰 Budget Allocation (Finance)</strong>
+                        <div style="font-size: 0.95em; color: #666; margin-top: 8px;">
+                            • Creative: $15,000<br>
+                            • Ad Spend: $30,000<br>
+                            • Tools: $5,000<br>
+                            • ROI Target: 3.2x
+                        </div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <strong>📊 Analytics Dashboard (Insights)</strong>
+                        <div style="font-size: 0.95em; color: #666; margin-top: 8px;">
+                            • Expected Reach: 100,000<br>
+                            • Conversion Target: 1,500<br>
+                            • Real-time tracking enabled
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; text-align: center; font-weight: bold;">
+                        ✅ Campaign Ready to Launch!
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        function stage9_reputation() {
+            setTimeout(() => {
+                document.getElementById('resultPanel').classList.remove('visible');
+                
+                // Show updated reputation
+                const updates = [
+                    { id: 'agent-marketing', oldRep: 105, newRep: 110 },
+                    { id: 'agent-finance', oldRep: 110, newRep: 115 },
+                    { id: 'agent-insights', oldRep: 95, newRep: 100 }
+                ];
+                
+                updates.forEach((update, index) => {
+                    setTimeout(() => {
+                        const agent = document.getElementById(update.id);
+                        const stats = agent.querySelector('.agent-stats');
+                        stats.innerHTML = `
+                            <div>Reputation: <strong style="color: #43e97b;">${update.newRep}</strong> <span style="font-size: 0.8em;">↑ +5</span></div>
+                            <div>Load: <strong>30%</strong></div>
+                        `;
+                        
+                        // Create sparkle effect
+                        for (let i = 0; i < 5; i++) {
+                            const agentCenter = getElementCenter(agent);
+                            createMessage(
+                                agentCenter.x,
+                                agentCenter.y,
+                                agentCenter.x + (Math.random() - 0.5) * 100,
+                                agentCenter.y - 50 - Math.random() * 50,
+                                800
+                            );
+                        }
+                    }, index * 500);
+                });
+            }, 500);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('AI Swarm Communication Demo Loaded! 🚀');
+        });
+    </script>
+</body>
+</html>
