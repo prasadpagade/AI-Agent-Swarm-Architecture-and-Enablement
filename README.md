@@ -12,7 +12,7 @@
 
 A comprehensive framework demonstrating how specialized AI agents collaborate to solve complex problems—combining technical architecture, working code examples, and enterprise rollout strategy.
 
-**Explore Full Portfolio:** [prasadpagade.github.io/Data_AI_Portfolio_website](https://prasadpagade.github.io/Data_AI_Portfolio_website/)
+**Explore Full Portfolio:** [prasadpagade.github.io/Data_AI_Portfolio_website]([https://prasadpagade.github.io/Data_AI_Portfolio_website/](https://prasadpagade.github.io/AI-Agent-Swarm-Architecture-and-Enablement/#demo))
 
 ---
 
